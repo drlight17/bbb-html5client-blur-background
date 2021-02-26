@@ -172,7 +172,7 @@ const start = (async () => {
 function blur_turn_on(blur_button_tippy) {
 	var  blur_button = $("#blur_button");
 	var blur_button_icon = blur_button.find('i');
-	blur_button.attr('aria-label', "Отключить размытие фона");
+	blur_button.attr('aria-label', "Unblur camera background");
 	blur_button_icon.addClass("icon-bbb-user").removeClass("icon-bbb-clear_status");
 	blur_button.find(">:first-child").removeClass("default--Z19H5du").removeClass("ghost--Z136aiN").addClass("primary--1IbqAO");
 	blur_button.removeClass("btn--29prju").removeClass("blur").addClass("unblur");
@@ -192,7 +192,7 @@ function blur_turn_on(blur_button_tippy) {
 function blur_turn_off(blur_button_tippy) {
 	var blur_button = $("#blur_button");
 	var blur_button_icon = blur_button.find('i');
-	blur_button.attr('aria-label', "Включить размытие фона");
+	blur_button.attr('aria-label', "Blur camera background");
 	blur_button_icon.removeClass( "icon-bbb-video_off" ).addClass("icon-bbb-clear_status").removeClass("icon-bbb-user");
 	blur_button.find(">:first-child").addClass("default--Z19H5du").addClass("ghost--Z136aiN").removeClass("primary--1IbqAO");
 	blur_button.addClass("btn--29prju").removeClass("unblur").addClass("blur");
