@@ -118,6 +118,17 @@ function getSimulcastInfo(videoStream) {
     return lines.join('\n');
 }
 
+/*drlight 20.04.2021 function returns true if all color channels in each pixel are 0 (or "blank") */
+function isCanvasBlank(canvas) {
+  return !canvas.getContext('2d')
+    .getImageData(0, 0, canvas.width, canvas.height).data
+    .some(channel => channel !== 0);
+}
+/* drlight sleep function*/
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /* drlight 24.02.2021 function to wait until gui buttons loaded*/
 
 function _waitForElement(selector, delay = 50, tries = 10000) {
@@ -562,7 +573,6 @@ function WebRtcPeer(mode, options, callback) {
 	async function perform(net,videoElement) {
 		// drlight 25.01.2021 check cycle condition
 		while (videoElement) {
-		//drlight 19.01.2021 TODO The video element has not loaded data yet. Please wait for `loadeddata` event on the <video> element
 		const backgroundBlurAmount = 10; // Defaults to 3. Should be an integer between 1 and 20.
 		const edgeBlurAmount = 5; //Defaults to 3. Should be an integer between 0 and 20.
 		const flipHorizontal = false; // If the output should be flipped horizontally. Defaults to false.
@@ -575,7 +585,6 @@ function WebRtcPeer(mode, options, callback) {
 		};
    		segmentation = await net.segmentPerson(videoElement, options);
 		bodyPix.drawBokehEffect(canvasElement, videoElement, segmentation, backgroundBlurAmount, edgeBlurAmount, flipHorizontal);
-
 		}
 	}
 	videoElement.onplaying = () => {
@@ -585,7 +594,7 @@ function WebRtcPeer(mode, options, callback) {
 	var divider = gcd (videoElement.videoWidth,videoElement.videoHeight);
 	var width_aspect = videoElement.videoWidth/divider;
 	var height_aspect = videoElement.videoHeight/divider;
-	videoElement.width = '480';
+	videoElement.width = '640';
 	videoElement.height = videoElement.width/width_aspect*height_aspect;
 	canvasElement.width = videoElement.width;
 	canvasElement.height = videoElement.height;
@@ -593,7 +602,7 @@ function WebRtcPeer(mode, options, callback) {
 };
 	/******************************************************/
 	
-    function start() {
+    async function start() {
         if (pc.signalingState === 'closed') {
             callback('The peer connection object is in "closed" state. This is most likely due to an invocation of the dispose method before accepting in the dialogue');
         }
@@ -602,6 +611,13 @@ function WebRtcPeer(mode, options, callback) {
             self.showLocalVideo();
         }
         if (videoStream) {
+			// drlight 20.04.2021 waiting for canvas
+			if ($(".blur").get(0) === undefined) {
+				while (isCanvasBlank(canvasElement)) {
+					await sleep(1000);
+					console.log('Sleeping because of blank canvas...');
+				};
+			}
             if (typeof videoStream.getTracks === 'function'
                   && typeof pc.addTrack === 'function') {
                 videoStream.getTracks().forEach(track => pc.addTrack(track, videoStream));
@@ -634,11 +650,12 @@ function WebRtcPeer(mode, options, callback) {
 				videoElement.srcObject = videoStream;
 				videoElement.play();
 				//drlight 18.02.2021 check if blur button enabled
-				if ($(".blur").get(0) === undefined) {
-					loadBodyPix(videoElement);
-					videoStream = canvasStream;
-				}
-				start();
+					if ($(".blur").get(0) === undefined) {
+						//document.body.appendChild(canvasElement);
+						loadBodyPix(videoElement);
+						videoStream = canvasStream;
+					}
+					start();
 				// drlight 26.02.2021 wait for video turned on button
 				const wait_video_on = (async () => {
 					const $el = await _waitForElement(".icon-bbb-video");
