@@ -1,4 +1,4 @@
-# bbb-html5client-blur-background
+# bbb-html5client-blur-background1
 Meteor client customization to support bodyPix for blurred camera background
 Using js bodyPix from CDN in header file and additional jquery and tippy js for making GUI
 
